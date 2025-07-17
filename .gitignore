@@ -1,0 +1,25 @@
+# Python Bytecode and cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+.env/
+ENV/
+env/
+.terraform/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Ignore JSON credentials and sensitive data
+*.json
+# Ignore Backend TF file
+*.TF
+*.hcl
+
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
