@@ -47,27 +47,47 @@ def write_terraform_credentials(token):
         json.dump(creds_content, f)
     os.chmod(creds_file, 0o600)
     logging.info(f"Terraform credentials file written at {creds_file}")
-
+def get_required_tf_version(workspace_name, org, token):
+    """
+    Fetch the required Terraform version for a given TFC workspace.
+    """
+    url = f"https://app.terraform.io/api/v2/organizations/{org}/workspaces/{workspace_name}"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/vnd.api+json"
+    }
+    resp = requests.get(url, headers=headers)
+    resp.raise_for_status()
+    tf_version = resp.json()["data"]["attributes"]["terraform-version"]
+    logging.info(f"Required Terraform version for {org}/{workspace_name}: {tf_version}")
+    return tf_version
+def switch_tfenv_version(version):
+    """
+    Use tfenv to install and switch to the required Terraform version.
+    """
+    subprocess.run(["tfenv", "install", version], check=True)
+    subprocess.run(["tfenv", "use", version], check=True)
+    logging.info(f"Switched to Terraform version {version} using tfenv")
 def ensure_terraform_init_and_login(org, workspace, token):
     """
     Writes backend config and credentials file,
-    runs terraform init and selects workspace,
-    ensuring full automation without manual login.
+    switches to required Terraform version,
+    runs terraform init and selects workspace.
     """
     write_backend_config(org, workspace)
     write_terraform_credentials(token)
 
-    # Run terraform init
+    required_version = get_required_tf_version(workspace, org, token)
+    switch_tfenv_version(required_version)
+
     subprocess.run(["terraform", "init"], check=True)
 
-    # Select existing or create new workspace locally
     try:
         subprocess.run(["terraform", "workspace", "select", workspace], check=True)
         logging.info(f"Selected existing workspace {workspace}")
     except subprocess.CalledProcessError:
         logging.info(f"Workspace {workspace} not found locally, creating it.")
         subprocess.run(["terraform", "workspace", "new", workspace], check=True)
-
 def remove_resources_cli(org, workspace, token, resources):
     """
     Remove resources from terraform state using CLI with ensured login.
