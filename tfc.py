@@ -3,6 +3,7 @@ import os
 import sys
 import json
 import logging
+import requests
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
