@@ -94,10 +94,10 @@ def main():
     remove_resources_cli(mgmt_org, mgmt_ws, tfc_token, s3_resources)
 
     logging.info("Destroying and deleting all application workspaces...")
-    #destroy_and_delete_all_app_workspaces(app_org, tfc_token, app_ws_list)
+    destroy_and_delete_all_app_workspaces(app_org, tfc_token, app_ws_list)
 
     logging.info("Destroying and deleting management workspace...")
-    #destroy_management_workspace(mgmt_org, mgmt_ws, tfc_token)
+    destroy_management_workspace(mgmt_org, mgmt_ws, tfc_token)
 
     if aws_account_id and aws_account_id.lower() != "skip":
         #close_aws_account(aws_account_id)
